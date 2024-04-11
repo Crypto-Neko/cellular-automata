@@ -20,7 +20,7 @@ class Tile():
             return "Please pass either 0 or 1 for the state."
 
     def __str__(self):
-        return str("(" + str(self.x) +", " + str(self.y) + ", " + str(self.s) + ")")
+        return str(self.s)
     
     __repr__ = __str__
 
@@ -29,55 +29,89 @@ class Tile():
 # Represents an automaton object, including implementations of the main functions driving the dynamical system. #
 #                                                                                                               #
 # Automaton.tiles: A matrix containing the tiles of the grid so self.tiles[y][x] gives the tile at (x, y).      #
-# Automaton.grid: A matrix containing the states of each tile such that self.grid[y][x] gives tile.s at (x, y). #
 #                                                                                                               #
 # Automaton.update_tiles: Run time forward one step, applying the rules of the dynamical system one time.       #
-# Automaton.show: Show the evolution of the state of the automaton through time as an animated grid.            #
+# Automaton.show_grid: Print the grid in the form of an x_size-by-y_size matrix.                                #
+# Automaton.play: Show the evolution of the state of the automaton through time as an animated grid.            #
 #################################################################################################################
 class Automaton():
     def __init__(self, x_size, y_size, tiles):
-        self.tiles = [[0]*y_size]
-        self.grid = [[0]*y_size]
-        i = 1
-        while i < x_size:
-            self.tiles.append([0]*y_size)
-            self.grid.append([0]*y_size)
-            i+=1
-        if not isinstance(tiles, list):
-            return "Please make sure tiles is a list."
-        for tile in tiles:
-            if tile.x > -1 and tile.y > -1 and tile.x < x_size and tile.y < y_size:
-                self.tiles[tile.y][tile.x] = tile
-                self.grid[tile.y][tile.x] = tile.s
 
-    # Moves the automaton forward one step in time according to pre-programmed rules.
-    def update_tiles(self):
+        #
+        # REWRITE ALL OF THIS!!!!
+        #
+
+        if t == 0:
+            self.tiles = [[0]*y_size]
+            i = 1
+            while i < x_size:
+                self.tiles.append([0]*y_size)
+                i+=1
+            if not isinstance(tiles, list):
+                return "Please make sure tiles is a list."
+            for tile in tiles:
+                if tile.x > -1 and tile.y > -1 and tile.x < x_size and tile.y < y_size:
+                    self.tiles[tile.y][tile.x] = tile
+        if t == 1:
+            n = 1
+
+    # Moves the automaton forward one step in time according to pre-programmed rules. Updates the automaton
+    # a total of n times using recursion.
+    def update_tiles(self, n):
 
         # Make new lists to store the updated tiles and grid so that the original matrices
         # are not updated while the rules are in the process of being applied.
-        new_tiles = [[0]*len(self.grid)]
-        new_grid = [[0]*len(self.grid)]
-        x_size = len(self.grid[0])
-        i = 0
+        new_tiles = [[0]*len(self.tiles)]
+        x_size = len(self.tiles[0])
+        y_size = len(self.tiles)
+        i = 1
         while i < x_size:
             new_tiles.append([0]*y_size)
-            new_grid.append([0]*y_size)
+            i+=1
         for column in self.tiles:
             for tile in column:
-                new_tiles[tile.y][tile.x] = Tile(tile.x, tile.x, tile.s)
-                new_grid[tile.y][tile.x] = tile.s
+                new_tiles[tile.y][tile.x] = Tile(tile.x, tile.y, tile.s)
 
         # Update the new tiles and grid matrices according to pre-programmed rules.
         for column in self.tiles:
             for tile in column:
-                left_state = self.grid[tile.y][tile.x - 1]
-                right_state = self.grid[tile.y][tile.x + 1]
-                up_state = self.grid[tile.y + 1][tile.x]
-                down_state = self.grid[tile.y - 1][tile.x]
+                left_state = self.tiles[tile.y][(tile.x - 1) % x_size].s
+                right_state = self.tiles[tile.y][(tile.x + 1) % x_size].s
+                up_state = self.tiles[(tile.y + 1) % y_size][tile.x].s
+                down_state = self.tiles[(tile.y - 1) % y_size][tile.x].s
+
+                pop = left_state + right_state + up_state + down_state
+                state = tile.s
+                if state == 1:
+                    if pop < 2:
+                        new_tiles[tile.y][tile.x].s = 0
+                    if pop == 2 or pop == 3:
+                        new_tiles[tile.y][tile.x].s = 1
+                    if pop > 3:
+                        new_tiles[tile.y][tile.x].s = 0
+                if state == 0 and pop == 3:
+                    new_tiles[tile.y][tile.x].s = 1
+
+        self.tiles = new_tiles
+        if n != 1:
+            update_tiles(self, n-1);
 
     # Demonstrate the evolution of the automaton through time in the form of an animated grid. WIP.
-    def show(self):
-        return 0
+    def show_grid(self):
+        j = 0
+        while j < len(self.tiles[0]):
+            i = 0
+            while i < len(self.tiles):
+                print(str(self.tiles[i][j]), end=" ")
+                i+=1
+            print()
+            j+=1
+
+    def __str__(self):
+        self.show_grid()
+        return str()
+
+    __repr__ = __str__
 
 
 #### CURRENT TESTING CODE ####
@@ -85,5 +119,5 @@ tile1 = Tile(0, 0, 1)
 tile2 = Tile(1, 0, 0)
 tile3 = Tile(0, 1, 0)
 tile4 = Tile(1, 1, 1)
-tiles = [tile1, tile2, tile3, tile4]
-automaton = Automaton(2, 2, tiles)
+tiles = [Tile(0, 0, 1), Tile(1, 0, 1), Tile(2, 0, 1), Tile(0, 1, 0), Tile(1, 1, 1), Tile(2, 1, 0), Tile(0, 2, 1), Tile(1, 2, 1), Tile(2, 2, 1)]
+automaton = Automaton(3, 3, tiles)
