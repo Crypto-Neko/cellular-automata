@@ -1,4 +1,5 @@
-import numpy as np
+import os   # Necessary to clear screen for demonstration.
+from time import sleep
 
 
 ###################################################################################
@@ -42,16 +43,16 @@ class Automaton():
 
         self.tiles = []
         i = 0
-        while i < x_size:
+        while i < y_size:
             j = 0
             row = []
-            while j < y_size:
+            while j < x_size:
                 row.append(Tile(0, 0, 0))
                 j+=1
             self.tiles.append(row)
             i+=1
         for tile in tiles:
-            self.tiles[tile.y][tile.x] = tile
+            self.tiles[tile.y][tile.x] = Tile(tile.x, tile.y, tile.s)
 
 
     # Moves the automaton forward one step in time according to pre-programmed rules. Updates the automaton
@@ -72,24 +73,21 @@ class Automaton():
                 j+=1
             new_tiles.append(row)
             i+=1
-        for column in self.tiles:
-            for tile in column:
-                self.tiles[tile.y][tile.x] = Tile(tile.x, tile.y, tile.s)
+        for row in self.tiles:
+            for tile in row:
+                new_tiles[tile.y][tile.x] = Tile(tile.x, tile.y, tile.s)
 
         # Update the new tiles and grid matrices according to pre-programmed rules.
         for row in self.tiles:
             for tile in row:
                 left_state = self.tiles[tile.y][(tile.x - 1) % x_size].s
                 right_state = self.tiles[tile.y][(tile.x + 1) % x_size].s
-                up_state = self.tiles[(tile.y + 1) % y_size][tile.x].s
-                down_state = self.tiles[(tile.y - 1) % y_size][tile.x].s
+                up_state = self.tiles[(tile.y - 1) % y_size][tile.x].s
+                down_state = self.tiles[(tile.y + 1) % y_size][tile.x].s
 
                 pop = left_state + right_state + up_state + down_state
                 state = tile.s
 
-                if tile.x == 0 and tile.y == 2:
-                    print(str(state))
-                    print(str(pop))
                 if state == 1:
                     if pop < 2:
                         new_tiles[tile.y][tile.x].s = 0
@@ -101,9 +99,6 @@ class Automaton():
                     new_tiles[tile.y][tile.x].s = 1
 
         self.tiles = new_tiles
-        #for column in new_tiles:
-        #    for tile in column:
-        #        self.tiles[tile.y][tile.x] = Tile(tile.x, tile.y, tile.s)
         if n != 1:
             self.update_tiles(n-1);
 
@@ -124,11 +119,34 @@ class Automaton():
 
     __repr__ = __str__
 
+    # Play the evolution of the system forward in the terminal.
+    def play(self, n=1):
+        os.system("clear")
+        while True:
+            self.show_grid()
+            sleep(2)
+            self.update_tiles(1)
+            os.system("clear")
+
 
 #### CURRENT TESTING CODE ####
+
+# Basic test
 tile1 = Tile(0, 0, 1)
 tile2 = Tile(1, 0, 0)
 tile3 = Tile(0, 1, 0)
 tile4 = Tile(1, 1, 1)
 tiles = [Tile(0, 0, 1), Tile(1, 0, 1), Tile(2, 0, 1), Tile(0, 1, 0), Tile(1, 1, 1), Tile(2, 1, 0), Tile(0, 2, 1), Tile(1, 2, 1), Tile(2, 2, 1), Tile(3, 3, 1), Tile(3, 4, 1), Tile(2, 4, 1), Tile(2, 3, 1)]
 automaton = Automaton(10, 10, tiles)
+
+# Beacon
+tile1 = Tile(0, 0, 1)
+tile2 = Tile(1, 0, 1)
+tile3 = Tile(0, 1, 1)
+tile4 = Tile(1, 1, 1)
+tile5 = Tile(2, 2, 1)
+tile6 = Tile(3, 3, 1)
+tile7 = Tile(3, 4, 1)
+tile8 = Tile(4, 3, 1)
+tiles = [tile1, tile2, tile3, tile4, tile5, tile6, tile7, tile8]
+smoke = Automaton(10, 10, tiles)
