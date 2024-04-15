@@ -1,5 +1,6 @@
 import os   # Necessary to clear screen for demonstration.
 from time import sleep
+from termcolor import colored
 
 
 ###################################################################################
@@ -108,7 +109,10 @@ class Automaton():
         while j < len(self.tiles[0]):
             i = 0
             while i < len(self.tiles):
-                print(str(self.tiles[j][i]), end=" ")
+                if self.tiles[j][i].s == 1:
+                    print(colored(str(self.tiles[j][i]), 'green'), end=" ")
+                else:
+                    print(colored(str(self.tiles[j][i]), 'red'), end=" ")
                 i+=1
             print()
             j+=1
