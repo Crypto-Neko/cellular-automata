@@ -47,12 +47,12 @@ class Automaton():
             j = 0
             row = []
             while j < x_size:
-                row.append(Tile(0, 0, 0))
+                row.append(Tile(j, i, 0))
                 j+=1
             self.tiles.append(row)
             i+=1
         for tile in tiles:
-            self.tiles[tile.y][tile.x] = Tile(tile.x, tile.y, tile.s)
+            self.tiles[tile.y][tile.x] = tile
 
 
     # Moves the automaton forward one step in time according to pre-programmed rules. Updates the automaton
@@ -69,7 +69,7 @@ class Automaton():
             j = 0
             row = []
             while j < y_size:
-                row.append(Tile(0, 0, 0))
+                row.append(Tile(j, i, 0))
                 j+=1
             new_tiles.append(row)
             i+=1
@@ -139,7 +139,7 @@ tile4 = Tile(1, 1, 1)
 tiles = [Tile(0, 0, 1), Tile(1, 0, 1), Tile(2, 0, 1), Tile(0, 1, 0), Tile(1, 1, 1), Tile(2, 1, 0), Tile(0, 2, 1), Tile(1, 2, 1), Tile(2, 2, 1), Tile(3, 3, 1), Tile(3, 4, 1), Tile(2, 4, 1), Tile(2, 3, 1)]
 automaton = Automaton(10, 10, tiles)
 
-# Beacon
+# Smoke
 tile1 = Tile(0, 0, 1)
 tile2 = Tile(1, 0, 1)
 tile3 = Tile(0, 1, 1)
