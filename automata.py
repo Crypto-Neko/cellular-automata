@@ -37,11 +37,16 @@ class Tile():
 # Automaton.play: Show the evolution of the state of the automaton through time as an animated grid.            #
 #################################################################################################################
 class Automaton():
-    def __init__(self, x_size, y_size, tiles):
+
+    # Initialize the Automaton object with x_size horizontal and y_size vertical size, a list of active tiles tiles,
+    # and d=0 or 1 for whether or not to count diagonally adjacent tiles towards population. Initializes all tiles
+    # not in the list tiles to Tile(x, y, 0).
+    def __init__(self, x_size, y_size, tiles, d=0):
 
         if not isinstance(tiles, list):
             return "Please make sure tiles is a list."
 
+        self.d = d
         self.tiles = []
         i = 0
         while i < y_size:
@@ -87,6 +92,12 @@ class Automaton():
                 down_state = self.tiles[(tile.y + 1) % y_size][tile.x].s
 
                 pop = left_state + right_state + up_state + down_state
+                if self.d == 1:
+                    diag_one = self.tiles[(tile.y - 1) % y_size][(tile.x - 1) % x_size].s
+                    diag_two = self.tiles[(tile.y + 1) % y_size][(tile.x - 1) % x_size].s
+                    diag_three = self.tiles[(tile.y + 1) % y_size][(tile.x + 1) % x_size].s
+                    diag_four = self.tiles[(tile.y - 1) % y_size][(tile.x + 1) % x_size].s
+                    pop += (diag_one + diag_two + diag_three + diag_four)
                 state = tile.s
 
                 if state == 1:
@@ -123,12 +134,12 @@ class Automaton():
 
     __repr__ = __str__
 
-    # Play the evolution of the system forward in the terminal.
-    def play(self, n=1):
+    # Play the evolution of the system forward in the terminal. t is the number of seconds to wait between each iteration.
+    def play(self, t=1):
         os.system("clear")
         while True:
             self.show_grid()
-            sleep(2)
+            sleep(t)
             self.update_tiles(1)
             os.system("clear")
 
